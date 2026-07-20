@@ -1,0 +1,29 @@
+{
+  "name": "icm-walk",
+  "version": "1.0.0",
+  "description": "CLI for validating workspaces against ICM (Interpretable Context Methodology) invariants. Walks a directory and reports pass/fail for each invariant — the walk test.",
+  "bin": {
+    "icm-walk": "./cli.js"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shift-zero/icm-walk.git"
+  },
+  "keywords": [
+    "icm",
+    "workspace",
+    "validation",
+    "agent",
+    "context",
+    "methodology"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
