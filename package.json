@@ -1,6 +1,6 @@
 {
   "name": "icm-walk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Workspace evaluation CLI — ICM walk, Cursor readiness checks, and methodology invariants.",
   "bin": {
     "icm-walk": "./cli.js"
