@@ -53,8 +53,23 @@ let icmMode = process.argv.includes('--icm');
 let targetDir = '.';
 let verbose = process.argv.includes('--verbose') || process.argv.includes('-v');
 
-// Determine mode. Default to ICM if no mode flag given (backward compat).
-let mode = cursorMode ? 'cursor' : icmMode ? 'icm' : 'icm';
+// Determine mode. Require explicit flag.
+let mode = cursorMode ? 'cursor' : icmMode ? 'icm' : null;
+
+// No mode specified — show help
+if (!mode) {
+  console.log(`
+${C.bold}icm-walk${C.reset} — Workspace Evaluation CLI
+
+${C.dim}Pick an evaluation mode:${C.reset}
+
+  icm-walk [directory] --icm          ${C.gray}# ICM walk${C.reset}
+  icm-walk [directory] --cursor       ${C.gray}# cursor evaluation${C.reset}
+
+${C.dim}Run with --help for full details.${C.reset}
+`);
+  process.exit(1);
+}
 
 // Extract directory from args (skip flags)
 for (const arg of process.argv.slice(2)) {
@@ -72,10 +87,9 @@ ${C.bold}icm-walk${C.reset} — Workspace Evaluation CLI
 ${C.dim}Validates a directory against methodology invariants.${C.reset}
 
 ${C.cyan}Usage:${C.reset}
-  icm-walk [directory]                ${C.gray}# default: ICM walk${C.reset}
-  icm-walk [directory] --icm          ${C.gray}# ICM walk (explicit)${C.reset}
-  icm-walk [directory] --cursor       ${C.gray}# cursor evaluation mode${C.reset}
-  icm-walk [directory] --json         ${C.gray}# JSON output (any mode)${C.reset}
+  icm-walk [directory] --icm          ${C.gray}# ICM walk${C.reset}
+  icm-walk [directory] --cursor       ${C.gray}# cursor evaluation${C.reset}
+  icm-walk [directory] --json         ${C.gray}# JSON output${C.reset}
   icm-walk -v                         ${C.gray}# verbose${C.reset}
   icm-walk --help                     ${C.gray}# this help${C.reset}
 

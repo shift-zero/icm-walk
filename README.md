@@ -20,9 +20,8 @@ npx icm-walk
 ## Usage
 
 ```bash
-# ICM Walk (default) — validates ICM workspace structure
-icm-walk [directory]               # shorthand — default mode
-icm-walk [directory] --icm         # explicit ICM walk
+# ICM Walk — validates ICM workspace structure
+icm-walk [directory] --icm
 
 # Cursor Evaluation — checks workspace readiness for Cursor/agent coding
 icm-walk [directory] --cursor
