@@ -49,43 +49,46 @@ const C = {
 
 let useJson = process.argv.includes('--json') || process.argv.includes('-j');
 let cursorMode = process.argv.includes('--cursor');
-let targetDir = process.argv[2] || '.';
+let icmMode = process.argv.includes('--icm');
+let targetDir = '.';
 let verbose = process.argv.includes('--verbose') || process.argv.includes('-v');
 
-if (cursorMode && process.argv[2] && !process.argv[2].startsWith('-')) {
-  targetDir = process.argv[2];
-} else if (cursorMode && process.argv[1] && !process.argv[1].startsWith('-')) {
-  targetDir = process.argv[1];
+// Determine mode. Default to ICM if no mode flag given (backward compat).
+let mode = cursorMode ? 'cursor' : icmMode ? 'icm' : 'icm';
+
+// Extract directory from args (skip flags)
+for (const arg of process.argv.slice(2)) {
+  if (!arg.startsWith('-')) {
+    targetDir = arg;
+    break;
+  }
 }
 
+// Help
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
   console.log(`
-${C.bold}icm-walk${C.reset} — Walk Test for ICM Workspaces
+${C.bold}icm-walk${C.reset} — Workspace Evaluation CLI
 
-${C.dim}Validates a directory against ICM invariants.${C.reset}
+${C.dim}Validates a directory against methodology invariants.${C.reset}
 
 ${C.cyan}Usage:${C.reset}
-  icm-walk [directory]                ${C.gray}# walk and validate${C.reset}
+  icm-walk [directory]                ${C.gray}# default: ICM walk${C.reset}
+  icm-walk [directory] --icm          ${C.gray}# ICM walk (explicit)${C.reset}
   icm-walk [directory] --cursor       ${C.gray}# cursor evaluation mode${C.reset}
-  icm-walk [directory] --json         ${C.gray}# JSON output${C.reset}
-  icm-walk [directory] -v             ${C.gray}# verbose mode${C.reset}
+  icm-walk [directory] --json         ${C.gray}# JSON output (any mode)${C.reset}
+  icm-walk -v                         ${C.gray}# verbose${C.reset}
   icm-walk --help                     ${C.gray}# this help${C.reset}
 
-${C.cyan}Cursor evaluation mode (--cursor):${C.reset}
-  Evaluates a workspace's readiness for Cursor/agent-based coding.
-  Checks for:
-  ${C.dim}·${C.reset} .cursorrules — exists, valid, meaningful rules
-  ${C.dim}·${C.reset} .cursorignore — present when needed
-  ${C.dim}·${C.reset} Entry file — Cursor-optimized sizing and structure
-  ${C.dim}·${C.reset} Token budgets — files sized for Cursor context window
-  ${C.dim}·${C.reset} Project docs — README, CONTRIBUTING, LICENSE
-  ${C.dim}·${C.reset} Test structure — can Cursor help test effectively?
-  ${C.dim}·${C.reset} Dependency clarity — package.json, config files findable
+${C.cyan}Evaluation modes:${C.reset}
+  ${C.bold}--icm${C.reset}      ICM Walk — validates a directory against ICM invariants
+               (entry files, stage contracts, factory/product separation)
+  ${C.bold}--cursor${C.reset}   Cursor Evaluation — checks workspace readiness for
+               Cursor/agent-based coding (configs, sizing, docs, tests)
 
 ${C.cyan}Exit codes:${C.reset}
   0   All checks pass
-  1   Warnings (fixable issues found)
-  2   Failures (breaking invariants found)
+  1   Warnings (fixable issues)
+  2   Failures (breaking invariants)
 `);
   process.exit(0);
 }
@@ -159,8 +162,7 @@ function record(check, status, detail) {
 
 // ─── Walk the workspace ─────────────────────────────────────────────
 
-if (cursorMode) {
-  // In cursor mode, skip ICM walk and go straight to cursor evaluation
+if (mode === 'cursor') {
   runCursorEvaluation();
   process.exit(overallStatus);
 }

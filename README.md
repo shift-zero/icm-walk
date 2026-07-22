@@ -2,11 +2,8 @@
 
 **Walk your workspace. Validate the invariants. Keep your agents oriented.**
 
-`icm-walk` is a CLI tool that validates a directory against the **Interpretable Context Methodology (ICM)** invariants. It runs the **walk test** — an agent with no memory opens the workspace cold and verifies it can orient, act, and report from the files alone.
-
-ICM (Van Clief & McDermott, [arXiv:2603.16021](https://arxiv.org/abs/2603.16021)) replaces orchestration code with folder structure: numbered folders carry sequencing, hierarchy carries context scoping, plain markdown files carry state. One agent, reading the right files at the right moment, does the work of a multi-agent framework.
-
-This tool tells you if your workspace actually follows the rules.
+`icm-walk` is a CLI tool that evaluates workspaces against methodology invariants.
+It supports multiple evaluation modes via feature flags.
 
 ## Install
 
@@ -23,23 +20,34 @@ npx icm-walk
 ## Usage
 
 ```bash
-# Walk the current directory
-icm-walk
+# ICM Walk (default) — validates ICM workspace structure
+icm-walk [directory]               # shorthand — default mode
+icm-walk [directory] --icm         # explicit ICM walk
 
-# Walk a specific workspace
-icm-walk /path/to/workspace
+# Cursor Evaluation — checks workspace readiness for Cursor/agent coding
+icm-walk [directory] --cursor
 
-# JSON output (for scripts, CI, or IDE plugins)
-icm-walk --json
+# JSON output (works with any mode)
+icm-walk [directory] --cursor --json
 
-# Verbose mode
+# Verbose
 icm-walk -v
 
 # Help
 icm-walk --help
 ```
 
-## What it checks
+## Evaluation Modes
+
+### `--icm` — ICM Walk (default)
+
+Validates a directory against the **Interpretable Context Methodology (ICM)**
+invariants. Runs the **walk test** — an agent with no memory opens the workspace
+cold and verifies it can orient, act, and report from the files alone.
+
+ICM (Van Clief & McDermott, [arXiv:2603.16021](https://arxiv.org/abs/2603.16021))
+replaces orchestration code with folder structure: numbered folders carry
+sequencing, hierarchy carries context scoping, plain markdown files carry state.
 
 | # | Invariant | What happens if it fails |
 |---|-----------|--------------------------|
@@ -54,17 +62,46 @@ icm-walk --help
 | 9 | Output folders exist per stage | Products have no home — next stage can't find them |
 | 10 | Token estimate per stage in 200–8,000 range | Bloated stages blow context windows |
 
+### `--cursor` — Cursor Evaluation
+
+Evaluates a workspace's readiness for **Cursor/agent-based coding**. Checks
+that your project is configured so an AI coding agent can work effectively.
+
+| # | Check | What it looks for |
+|---|-------|-------------------|
+| 1 | `.cursorrules` | Exists, sized under 2,000 tokens, covers tech stack, code style, and testing |
+| 2 | `.cursorignore` | Present when generated dirs exist (node_modules, .venv, dist) |
+| 3 | Entry file | Sized for Cursor's context window (target < 800 tokens) |
+| 4 | Cursor hints | Entry file contains Cursor-specific guidance (optional) |
+| 5 | README | Has setup and usage sections — Cursor uses this as primary orientation |
+| 6 | `.gitignore` | Present — Cursor respects it to skip build artifacts |
+| 7 | Dependency manifest | `package.json`, `pyproject.toml`, or `Cargo.toml` found |
+| 8 | Tests | Test directory or test files exist |
+| 9 | File size distribution | Analyzes all source files, flags anything over 3,000 tokens |
+| 10 | tsconfig.json | Bonus check for TypeScript projects |
+
+```bash
+# Quick read on a project
+icm-walk /path/to/project --cursor
+
+# CI pipeline check
+icm-walk /path/to/project --cursor --json | jq '.status'
+```
+
 ## Exit codes
 
-- **0** — All checks pass. An agent can walk this workspace cold.
+- **0** — All checks pass. Workspace is healthy.
 - **1** — Warnings only. Workspace works but has cleanup opportunities.
 - **2** — Failures. Breaking invariants — fix before relying on this workspace.
 
 ## Integrating with CI
 
 ```bash
-icm-walk --json | jq '.status'
-# → "pass" | "warn" | "fail"
+# ICM mode CI check
+icm-walk --icm --json | jq '.status'
+
+# Cursor mode CI check
+icm-walk --cursor --json | jq '.status'
 ```
 
 ## License

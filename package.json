@@ -1,7 +1,7 @@
 {
   "name": "icm-walk",
   "version": "1.0.0",
-  "description": "CLI for validating workspaces against ICM (Interpretable Context Methodology) invariants. Walks a directory and reports pass/fail for each invariant — the walk test.",
+  "description": "Workspace evaluation CLI — ICM walk, Cursor readiness checks, and methodology invariants.",
   "bin": {
     "icm-walk": "./cli.js"
   },
@@ -16,7 +16,9 @@
     "validation",
     "agent",
     "context",
-    "methodology"
+    "methodology",
+    "cursor",
+    "evaluation"
   ],
   "engines": {
     "node": ">=18"
